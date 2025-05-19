@@ -5,6 +5,7 @@ include("database.php");
 $msg = "";
 $errors = [];
 $name = $email = $usertype = "";
+$has_errors = false; // New variable to trigger input shake animation
 
 if (isset($_POST["submit"])) {
     $name = trim($_POST['user_name'] ?? '');
@@ -74,6 +75,10 @@ if (isset($_POST["submit"])) {
         }
     }
 
+    if (!empty($errors)) {
+        $has_errors = true; // Set flag for shake animation
+    }
+
     if (empty($errors)) {
         $name_escaped = mysqli_real_escape_string($conn, $name);
         $usertype_escaped = mysqli_real_escape_string($conn, $usertype);
@@ -87,6 +92,7 @@ if (isset($_POST["submit"])) {
         } else {
             $errors[] = "Error registering user.";
             error_log("Database error: " . mysqli_error($conn));
+            $has_errors = true;
         }
     }
 }
@@ -119,20 +125,20 @@ if (isset($_POST["submit"])) {
                     <p class="success-message"><?php echo htmlspecialchars($msg); ?></p>
                 <?php endif; ?>
                 <label for="username" class="user-name">USERNAME</label>
-                <input type="text" id="username" placeholder="Enter your username..." class="input-fields" name="user_name" value="<?php echo htmlspecialchars($name); ?>" required />
+                <input type="text" id="username" placeholder="Enter your username..." class="input-fields <?php echo $has_errors ? 'input-error' : ''; ?>" name="user_name" value="<?php echo htmlspecialchars($name); ?>" required />
                 <label for="email" class="user-name">EMAIL</label>
-                <input type="email" id="email" placeholder="Enter your email..." class="input-fields" name="email" value="<?php echo htmlspecialchars($email); ?>" required />
+                <input type="email" id="email" placeholder="Enter your email..." class="input-fields <?php echo $has_errors ? 'input-error' : ''; ?>" name="email" value="<?php echo htmlspecialchars($email); ?>" required />
                 <label for="usertype" class="user-name">USER TYPE</label>
-                <select id="usertype" class="input-fields" name="user_type" required>
+                <select id="usertype" class="input-fields <?php echo $has_errors ? 'input-error' : ''; ?>" name="user_type" required>
                     <option value="user" <?php echo $usertype === 'user' ? 'selected' : ''; ?>>USER</option>
                     <option value="admin" <?php echo $usertype === 'admin' ? 'selected' : ''; ?>>ADMIN</option>
                 </select>
                 <label for="password" class="user-name">PASSWORD</label>
-                <input type="password" id="password" placeholder="Enter your password..." class="input-fields" name="password" required />
+                <input type="password" id="password" placeholder="Enter your password..." class="input-fields <?php echo $has_errors ? 'input-error' : ''; ?>" name="password" required />
                 <label for="re-enter-password" class="user-name">CONFIRM PASSWORD</label>
-                <input type="password" id="re-enter-password" placeholder="Confirm your password..." class="input-fields" name="cpassword" required />
+                <input type="password" id="re-enter-password" placeholder="Confirm your password..." class="input-fields <?php echo $has_errors ? 'input-error' : ''; ?>" name="cpassword" required />
                 <label for="profile_picture" class="user-name">PROFILE PICTURE</label>
-                <input type="file" id="profile_picture" class="input-fields" name="profile_picture" accept="image/png,image/jpeg,image/jpg" required />
+                <input type="file" id="profile_picture" class="input-fields <?php echo $has_errors ? 'input-error' : ''; ?>" name="profile_picture" accept="image/png,image/jpeg,image/jpg" required />
                 <button type="submit" class="register-button" name="submit">Register</button>
                 <p class="login-text">Already have an account? <a href="login.php">Login now</a></p>
             </form>

@@ -31,6 +31,7 @@ $errors = [];
 $name = $user['name'];
 $email = $user['email'];
 $usertype = $user['user_type'];
+$has_errors = false; // New variable for shake animation
 
 if (isset($_POST["submit"])) {
     $name = trim($_POST['user_name'] ?? '');
@@ -90,6 +91,10 @@ if (isset($_POST["submit"])) {
         }
     }
 
+    if (!empty($errors)) {
+        $has_errors = true; // Set flag for shake animation
+    }
+
     if (empty($errors)) {
         $name_escaped = mysqli_real_escape_string($conn, $name);
         $usertype_escaped = mysqli_real_escape_string($conn, $usertype);
@@ -104,6 +109,7 @@ if (isset($_POST["submit"])) {
         } else {
             $errors[] = "Error updating user.";
             error_log("Database error: " . mysqli_error($conn));
+            $has_errors = true;
         }
     }
 }
@@ -133,16 +139,16 @@ if (isset($_POST["submit"])) {
                     </div>
                 <?php endif; ?>
                 <label for="username" class="user-name">USERNAME</label>
-                <input type="text" id="username" placeholder="Enter username..." class="input-fields" name="user_name" value="<?php echo htmlspecialchars($name); ?>" required />
+                <input type="text" id="username" placeholder="Enter username..." class="input-fields <?php echo $has_errors ? 'input-error' : ''; ?>" name="user_name" value="<?php echo htmlspecialchars($name); ?>" required />
                 <label for="email" class="user-name">EMAIL</label>
-                <input type="email" id="email" placeholder="Enter email..." class="input-fields" name="email" value="<?php echo htmlspecialchars($email); ?>" required />
+                <input type="email" id="email" placeholder="Enter email..." class="input-fields <?php echo $has_errors ? 'input-error' : ''; ?>" name="email" value="<?php echo htmlspecialchars($email); ?>" required />
                 <label for="usertype" class="user-name">USER TYPE</label>
-                <select id="usertype" class="input-fields" name="user_type" required>
+                <select id="usertype" class="input-fields <?php echo $has_errors ? 'input-error' : ''; ?>" name="user_type" required>
                     <option value="user" <?php echo $usertype === 'user' ? 'selected' : ''; ?>>USER</option>
                     <option value="admin" <?php echo $usertype === 'admin' ? 'selected' : ''; ?>>ADMIN</option>
                 </select>
                 <label for="profile_picture" class="user-name">PROFILE PICTURE</label>
-                <input type="file" id="profile_picture" class="input-fields" name="profile_picture" accept="image/png,image/jpeg,image/jpg" />
+                <input type="file" id="profile_picture" class="input-fields <?php echo $has_errors ? 'input-error' : ''; ?>" name="profile_picture" accept="image/png,image/jpeg,image/jpg" />
                 <?php if ($user['profile_picture']): ?>
                     <p>Current: <img src="<?php echo htmlspecialchars($user['profile_picture']); ?>" alt="Current Profile" class="table-profile-pic"/></p>
                 <?php endif; ?>
